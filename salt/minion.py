@@ -2231,6 +2231,7 @@ class Minion(MinionBase):
         for ind in range(0, num_funcs):
             function_name = data["fun"][ind]
             function_args = data["arg"][ind]
+            minion_instance.functions.pack["__context__"][data["jid"] + "_function_index"] = ind
             if not multifunc_ordered:
                 ret["success"][function_name] = False
             try:
@@ -2269,7 +2270,8 @@ class Minion(MinionBase):
             ret["jid"] = data["jid"]
             ret["fun"] = data["fun"]
             ret["fun_args"] = data["arg"]
-            if "user" in data:
+            minion_instance.functions.pack["__context__"].pop(data["jid"] + "_function_index", None)
+        if "user" in data:
                 ret["user"] = data["user"]
         if "metadata" in data:
             ret["metadata"] = data["metadata"]
