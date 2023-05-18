@@ -69,7 +69,8 @@ tags
 .doctrees
 
 # Allow a user to set their own _version.py for testing
-_version.py
+# Ignored on this branch since we want to explicitly set it.
+# _version.py
 
 # Ignore auto generated _syspaths.py file
 _syspaths.py

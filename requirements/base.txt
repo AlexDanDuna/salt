@@ -1,10 +1,17 @@
-Jinja2
+# Set at 3.0.3 due to vulnerabilities in previous packages
+Jinja2==3.0.3
 msgpack>=0.5,!=0.5.5
 PyYAML
-MarkupSafe
+# Set at 2.0.1 due to vulnerabilities in previous packages
+MarkupSafe==2.0.1
 requests>=1.0.0
 # Requirements for Tornado 4.5.3 (vendored as salt.ext.tornado)
 backports-abc==0.5; python_version < '3.0'
 singledispatch==3.4.0.3; python_version < '3.4'
 # Required by Tornado to handle threads stuff.
 futures>=2.0; python_version < '3.0'
+
+# Security fixes
+certifi==2022.12.07
+urllib3==1.26.5
+wheel==0.38.0
