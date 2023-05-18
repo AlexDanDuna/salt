@@ -285,6 +285,7 @@ class SaltStackVersion(object):
 
     @classmethod
     def parse(cls, version_string):
+        print("Entered parsing method")
         if version_string.lower() in cls.LNAMES:
             return cls.from_name(version_string)
         vstr = version_string.decode() if isinstance(version_string, bytes) else version_string
@@ -293,6 +294,7 @@ class SaltStackVersion(object):
             raise ValueError(
                 'Unable to parse version string: \'{0}\''.format(version_string)
             )
+        print(str(match.groups()))
         return cls(*match.groups())
 
     @classmethod
