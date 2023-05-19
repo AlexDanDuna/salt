@@ -2,4 +2,4 @@
 
 from salt.version import SaltStackVersion
 
-__saltstack_version__ = SaltStackVersion(3000, 3)
+__saltstack_version__ = SaltStackVersion(3000, 2)
