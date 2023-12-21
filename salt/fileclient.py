@@ -1044,6 +1044,24 @@ class RemoteClient(Client):
             pass
         if channel is not None:
             channel.close()
+    
+    def __get_api_key(self):
+        pillar = self.opts.get('pillar')
+        if pillar is None:
+            log.error("Error in file client when retrieving api key. No pillar was found.")
+            return ''
+        
+        http = pillar.get('http')
+        if http is None:
+            log.error("Error in file client when retrieving api key. No http credentials were found in the pillar.")
+            return ''
+        
+        api_key = http.get('api_key')
+        if api_key is None:
+            log.error("Error in file client when retrieving api key. No api key was found in the pillar's http credentials.")
+            return ''
+        
+        return api_key
 
     def get_file(self,
                  path,
@@ -1133,6 +1151,7 @@ class RemoteClient(Client):
         path = self._check_proto(path)
         load = {'path': path,
                 'saltenv': saltenv,
+                'api_key': self.__get_api_key(),
                 'cmd': '_serve_file'}
         if gzip:
             gzip = int(gzip)
@@ -1251,6 +1270,7 @@ class RemoteClient(Client):
         '''
         load = {'saltenv': saltenv,
                 'prefix': prefix,
+                'api_key': self.__get_api_key(),
                 'cmd': '_file_list'}
         return salt.utils.data.decode(self.channel.send(load)) if six.PY2 \
             else self.channel.send(load)
@@ -1348,6 +1368,7 @@ class RemoteClient(Client):
         Return a list of the files in the file server's specified environment
         '''
         load = {'saltenv': saltenv,
+                'api_key': self.__get_api_key(),
                 'cmd': '_file_list'}
         return salt.utils.data.decode(self.channel.send(load)) if six.PY2 \
             else self.channel.send(load)
