@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import warnings
 import sys
 import importlib
+from importlib.util import spec_from_loader
 
 
 class TornadoImporter(object):
@@ -15,6 +16,11 @@ class TornadoImporter(object):
     def find_module(self, module_name, package_path=None):
         if module_name.startswith('tornado'):
             return self
+        return None
+
+    def find_spec(self, module_name, path, target=None):
+        if module_name.startswith('tornado'):
+            return spec_from_loader(module_name, self)
         return None
 
     def load_module(self, name):
