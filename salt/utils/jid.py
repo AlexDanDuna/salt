@@ -7,6 +7,7 @@ from calendar import month_abbr as months
 import datetime
 import hashlib
 import os
+import sys
 
 import salt.utils.stringutils
 from salt.ext import six
@@ -18,6 +19,8 @@ def _utc_now():
     '''
     Helper method so tests do not have to patch the built-in method.
     '''
+    if sys.version_info > (3, 11):
+        return datetime.datetime.now(datetime.UTC)
     return datetime.datetime.utcnow()
 
 
