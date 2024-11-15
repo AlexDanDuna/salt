@@ -9,7 +9,7 @@ import re
 import sys
 
 # Import salt libs
-from salt.ext.six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error,no-name-in-module
+from salt.ext.six.moves.urllib.parse import urlparse, urlunparse, urlunsplit  # pylint: disable=import-error,no-name-in-module
 import salt.utils.data
 import salt.utils.path
 import salt.utils.platform
@@ -49,9 +49,7 @@ def create(path, saltenv=None):
     path = salt.utils.data.decode(path)
 
     query = 'saltenv={0}'.format(saltenv) if saltenv else ''
-    url = salt.utils.data.decode(urlunparse(('file', '', path, '', query, '')))
-    return 'salt://{0}'.format(url[len('file:///'):])
-
+    return f'salt://{salt.utils.data.decode(urlunsplit(("", "", path, query, "")))}'
 
 def is_escaped(url):
     '''
