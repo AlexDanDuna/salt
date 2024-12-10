@@ -625,7 +625,7 @@ def absent(name, **kwargs):
         return ret
 
     try:
-        __salt__['pkg.del_repo'](repo=name, **kwargs)
+        __salt__['pkg.del_repo'](name, **kwargs)
     except (CommandExecutionError, SaltInvocationError) as exc:
         ret['result'] = False
         ret['comment'] = exc.strerror
