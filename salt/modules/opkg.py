@@ -187,7 +187,7 @@ def _process_restartcheck_result(rs_result, **kwargs):
             _update_nilrt_restart_state()
             __salt__['system.set_reboot_required_witnessed']()
             reboot_required = True
-    if kwargs.get("restart_services", True) or not reboot_required:
+    if kwargs.get("always_restart_services", True) or not reboot_required:
         for rstr in rs_result:
             if "System restart required" not in rstr:
                 service = os.path.join("/etc/init.d", rstr)
@@ -836,25 +836,25 @@ def install(
     if not list_pkgs_errors:
         ret = salt.utils.data.compare_dicts(old, new)
 
-    if pkg_type == "file" and reinstall:
-        # For file-based packages, prepare 'to_reinstall' to have a list
-        # of all the package names that may have been reinstalled.
-        # This way, we could include reinstalled packages in 'ret'.
-        for pkgfile in to_install:
-            # Convert from file name to package name.
-            cmd = ["opkg", "info", pkgfile]
-            out = _call_opkg(cmd)
-            if out["retcode"] == 0:
-                # Just need the package name.
-                pkginfo_dict = _process_info_installed_output(out["stdout"], [])
-                if pkginfo_dict:
-                    to_reinstall.append(next(iter(pkginfo_dict)))
-
-    for pkgname in to_reinstall:
-        if pkgname not in ret or pkgname in old:
-            ret.update(
-                {pkgname: {"old": old.get(pkgname, ""), "new": new.get(pkgname, "")}}
-            )
+        if pkg_type == "file" and reinstall:
+            # For file-based packages, prepare 'to_reinstall' to have a list
+            # of all the package names that may have been reinstalled.
+            # This way, we could include reinstalled packages in 'ret'.
+            for pkgfile in to_install:
+                # Convert from file name to package name.
+                cmd = ["opkg", "info", pkgfile]
+                out = _call_opkg(cmd)
+                if out["retcode"] == 0:
+                    # Just need the package name.
+                    pkginfo_dict = _process_info_installed_output(out["stdout"], [])
+                    if pkginfo_dict:
+                        to_reinstall.append(next(iter(pkginfo_dict)))
+    
+        for pkgname in to_reinstall:
+            if pkgname not in ret or pkgname in old:
+                ret.update(
+                    {pkgname: {"old": old.get(pkgname, ""), "new": new.get(pkgname, "")}}
+                )
 
     rs_result = _get_restartcheck_result(errors)
 
@@ -870,7 +870,7 @@ def install(
 
     if list_pkgs_errors:
         raise CommandExecutionError(
-            "Problem encountered after installing package(s). Cannot provide changes list.",
+            "Problem encountered after successfully installing package(s). Cannot provide changes list.",
             info={"errors": list_pkgs_errors}
         )
 
