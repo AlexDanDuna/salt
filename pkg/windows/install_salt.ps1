@@ -82,6 +82,9 @@ $ARCH          = $(. $PYTHON_BIN -c "import platform; print(platform.architectur
 $PROJECT_DIR     = $(git rev-parse --show-toplevel)
 $SALT_DEPS       = "$PROJECT_DIR\requirements\static\pkg\py$PY_VERSION\windows.txt"
 
+# Environment variables
+$env:SALT_BUILD_ALL_BINS = 1 # this is necessary because salt builds no longer include salt-master and some other scripts on Windows
+
 if ( ! $SkipInstall ) {
   #-------------------------------------------------------------------------------
   # Start the Script
