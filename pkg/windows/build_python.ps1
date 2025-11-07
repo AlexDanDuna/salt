@@ -47,9 +47,6 @@ param(
 
 )
 
-# Script Variables
-$PROJECT_DIR     = $(git rev-parse --show-toplevel)
-
 #-------------------------------------------------------------------------------
 # Script Preferences
 #-------------------------------------------------------------------------------
@@ -157,6 +154,21 @@ Write-Host "Creating Temporary PowerShell Profile: " -NoNewline
 Write-Result "Success" -ForegroundColor Green
 
 #-------------------------------------------------------------------------------
+# Make sure we're not in a virtual environment
+#-------------------------------------------------------------------------------
+if ( $env:VIRTUAL_ENV ) {
+    Write-Host "Deactivating virtual environment"
+    . deactivate
+    Write-Host $env:VIRTUAL_ENV
+    if ( $env:VIRTUAL_ENV ) {
+        Write-Result "Failed" -ForegroundColor Red
+        exit 1
+    } else {
+        Write-Result "Success" -ForegroundColor Green
+    }
+}
+
+#-------------------------------------------------------------------------------
 # Script Variables
 #-------------------------------------------------------------------------------
 $SCRIPT_DIR   = (Get-ChildItem "$($myInvocation.MyCommand.Definition)").DirectoryName
@@ -174,6 +186,17 @@ if ( $Architecture -eq "x64" ) {
 #-------------------------------------------------------------------------------
 # Prepping Environment
 #-------------------------------------------------------------------------------
+if ( Test-Path -Path "$SCRIPT_DIR\venv" ) {
+    Write-Host "Removing virtual environment directory: " -NoNewline
+    Remove-Item -Path "$SCRIPT_DIR\venv" -Recurse -Force
+    if ( Test-Path -Path "$SCRIPT_DIR\venv" ) {
+        Write-Result "Failed" -ForegroundColor Red
+        exit 1
+    } else {
+        Write-Result "Success" -ForegroundColor Green
+    }
+}
+
 if ( Test-Path -Path "$RELENV_DIR" ) {
     Write-Host "Removing existing relenv directory: " -NoNewline
     Remove-Item -Path "$RELENV_DIR" -Recurse -Force
@@ -194,6 +217,30 @@ if ( Test-Path -Path "$BUILD_DIR" ) {
     } else {
         Write-Result "Success" -ForegroundColor Green
     }
+}
+
+#-------------------------------------------------------------------------------
+# Setting Up Virtual Environment
+#-------------------------------------------------------------------------------
+Write-Host "Installing virtual environment: " -NoNewline
+Start-Process -FilePath "$SYS_PY_BIN" `
+              -ArgumentList "-m", "venv", "venv" `
+              -WorkingDirectory "$SCRIPT_DIR" `
+              -Wait -WindowStyle Hidden
+if ( Test-Path -Path "$SCRIPT_DIR\venv" ) {
+    Write-Result "Success" -ForegroundColor Green
+} else {
+    Write-Result "Failed"
+    exit 1
+}
+
+Write-Host "Activating virtual environment: " -NoNewline
+. "$SCRIPT_DIR\venv\Scripts\activate.ps1"
+if ( $env:VIRTUAL_ENV ) {
+    Write-Result "Success" -ForegroundColor Green
+} else {
+    Write-Result "Failed" -ForegroundColor Red
+    exit 1
 }
 
 #-------------------------------------------------------------------------------

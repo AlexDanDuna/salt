@@ -82,9 +82,6 @@ if ( $Architecture -eq "amd64" ) {
   $Architecture = "x64"
 }
 
-# Environment variables
-$env:SALT_BUILD_ALL_BINS = 1 # this is necessary because salt builds no longer include salt-master and some other scripts on Windows
-
 #-------------------------------------------------------------------------------
 # Verify Salt and Version
 #-------------------------------------------------------------------------------
@@ -140,6 +137,34 @@ Write-Host "- Python Version: $PythonVersion"
 Write-Host "- Relenv Version: $RelenvVersion"
 Write-Host "- Architecture:   $Architecture"
 Write-Host $("v" * 80)
+
+#-------------------------------------------------------------------------------
+# Install NSIS
+#-------------------------------------------------------------------------------
+
+$KeywordArguments = @{}
+if ( $CICD ) {
+    $KeywordArguments["CICD"] = $true
+}
+& "$SCRIPT_DIR\install_nsis.ps1" @KeywordArguments
+if ( ! $? ) {
+    Write-Host "Failed to install NSIS"
+    exit 1
+}
+
+#-------------------------------------------------------------------------------
+# Install WIX
+#-------------------------------------------------------------------------------
+
+$KeywordArguments = @{}
+if ( $CICD ) {
+    $KeywordArguments["CICD"] = $true
+}
+& "$SCRIPT_DIR\install_wix.ps1" @KeywordArguments
+if ( ! $? ) {
+    Write-Host "Failed to install WIX"
+    exit 1
+}
 
 #-------------------------------------------------------------------------------
 # Install Visual Studio Build Tools
@@ -226,6 +251,17 @@ if ( $CICD ) {
 }
 
 & "$SCRIPT_DIR\nsis\build_pkg.ps1" @KeywordArguments
+
+if ( ! $? ) {
+    Write-Host "Failed to build NSIS package"
+    exit 1
+}
+
+#-------------------------------------------------------------------------------
+# Build MSI Package
+#-------------------------------------------------------------------------------
+
+& "$SCRIPT_DIR\msi\build_pkg.ps1" @KeywordArguments
 
 if ( ! $? ) {
     Write-Host "Failed to build NSIS package"
