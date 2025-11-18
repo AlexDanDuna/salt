@@ -363,7 +363,7 @@ class AsyncReqChannel:
                 if _try >= tries:
                     if isinstance(exc, salt.ext.tornado.iostream.StreamClosedError):
                         # Convert a tornado.iostream.StreamClosedError to a SaltClientError as
-                        # the StreamClosedError is not properly handled by callers (e.g. crypt.sign_in,
+                        # the StreamClosedError is not properly handled by callers (e.g. crypt._authenticate,
                         # which was noticed to sometimes break Windows minions from reconnecting, 
                         # upon restarting the master machine. The issue seems to occur more consistently when using
                         # a Windows master).
