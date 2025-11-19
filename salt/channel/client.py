@@ -369,7 +369,7 @@ class AsyncReqChannel:
                         # a Windows master).
                         # NOTE: Converting this particular exception to a SaltClientError was the behavior before 
                         # https://github.com/saltstack/salt/pull/61468.
-                        raise SaltClientError("Connection to master lost") 
+                        raise salt.exceptions.SaltClientError("Connection to master lost") 
                     raise
                 else:
                     _try += 1
