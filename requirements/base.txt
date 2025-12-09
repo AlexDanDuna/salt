@@ -18,7 +18,11 @@ psutil<6.0.0; python_version <= '3.9'
 psutil>=5.0.0; python_version >= '3.10'
 packaging>=21.3
 looseversion
-croniter>=0.3.0,!=0.3.22; sys_platform != 'win32'
+
+# Remove croniter as a dependency as this significantly increases the LinuxRT image size, and is used for chron jobs,
+# which we have not supported out of the box for salt 3000.2 either, as we did not install this dep previously.
+# croniter>=0.3.0,!=0.3.22; sys_platform != 'win32'
+
 # We need contextvars for salt-ssh
 contextvars
 cryptography>=42.0.0
