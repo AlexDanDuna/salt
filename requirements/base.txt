@@ -1,7 +1,7 @@
 --constraint=constraints.txt
 
 Jinja2>=3.1.5
-# We don't use this, and we don't have a package available for it on RT
+# NI: We don't use this, and we don't have a package available for it on RT
 #jmespath 
 msgpack>=1.0.0
 PyYAML
@@ -9,9 +9,9 @@ MarkupSafe
 requests<2.32.0 ; python_version < '3.10'
 requests>=2.32.3 ; python_version >= '3.10'
 certifi==2023.07.22; python_version < '3.10'
-# Allowing older version for certifi since we don't have >=2024.7.4 available on RT.
-# Salt was using version 2023 before upgrading to 2024.7.4.
-#certifi>=2024.7.4; python_version >= '3.10'
+# NI: Allowing older version for certifi since we don't have >=2024.7.4 available on RT;
+# salt was using version 2023 before upgrading to 2024.7.4.
+# certifi>=2024.7.4; python_version >= '3.10'
 certifi>=2024.2.2; python_version >= '3.10'
 distro>=1.0.1
 psutil<6.0.0; python_version <= '3.9'
@@ -19,13 +19,14 @@ psutil>=5.0.0; python_version >= '3.10'
 packaging>=21.3
 looseversion
 
-# Remove croniter as a dependency as this significantly increases the LinuxRT image size, and is used for chron jobs,
+# NI: Remove croniter as a dependency as this significantly increases the LinuxRT image size, and is used for chron jobs,
 # which we have not supported out of the box for salt 3000.2 either, as we did not install this dep previously.
 # croniter>=0.3.0,!=0.3.22; sys_platform != 'win32'
 
+# NI: We're removing this as a dependency because contextvars is available in the stdlib for Python >= 3.7.
 # We need contextvars for salt-ssh
-contextvars
+# contextvars
 cryptography>=42.0.0
-# Allowing newer urllib3 since newer salt versions have upgraded to >=2.0.0 without making modifications to the source code.
+# NI: Allowing newer urllib3 since newer salt versions have upgraded to >=2.0.0 without making modifications to the source code.
 # urllib3>=1.26.20,<2.0.0
 urllib3>=1.26.20
