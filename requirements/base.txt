@@ -23,8 +23,10 @@ looseversion
 # which we have not supported out of the box for salt 3000.2 either, as we did not install this dep previously.
 # croniter>=0.3.0,!=0.3.22; sys_platform != 'win32'
 
+
+# We're removing this as a dependency because contextvars is available in the stdlib for Python >= 3.7.
 # We need contextvars for salt-ssh
-contextvars
+# contextvars
 cryptography>=42.0.0
 # Allowing newer urllib3 since newer salt versions have upgraded to >=2.0.0 without making modifications to the source code.
 # urllib3>=1.26.20,<2.0.0
