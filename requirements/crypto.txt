@@ -1,6 +1,6 @@
 # NI: We want to use pycryptodome on LinuxRT as that's installed outside of salt and we want to conserve disk space.
 # Salt 3006.13 still has fallbacks to pycryptodome (i.e. it does "import Crypto" if "import Cryptodome" fails)
-# pycryptodomex>=3.9.8
+#pycryptodomex>=3.9.8
 pycryptodomex>=3.9.8; sys_platform != "linux"
 pycryptodome>=3.9.8; sys_platform == "linux"
 
