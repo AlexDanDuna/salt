@@ -12,6 +12,9 @@ from collections import deque
 
 from salt._logging.mixins import ExcInfoOnLogLevelFormatMixin
 
+# third party libraries
+import concurrent_log_handler
+
 log = logging.getLogger(__name__)
 
 
