@@ -26,7 +26,7 @@ QUIET = logging.QUIET = 1000
 
 import salt.defaults.exitcodes  # isort:skip  pylint: disable=unused-import
 from salt._logging.handlers import DeferredStreamHandler  # isort:skip
-import RotatingFileHandler  # isort:skip
+ from salt._logging.handlers import RotatingFileHandler  # isort:skip
 if sys.platform.startswith("win"):
     from salt._logging.handlers import ConcurrentRotatingFileHandler  # isort:skip
 from salt._logging.handlers import StreamHandler  # isort:skip
