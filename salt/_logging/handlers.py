@@ -161,6 +161,16 @@ class RotatingFileHandler(
             super().handleError(record)
 
 
+class ConcurrentRotatingFileHandler(
+    ExcInfoOnLogLevelFormatMixin, concurrent_log_handler.ConcurrentRotatingFileHandler
+):
+    """
+    Added by NI. Use third party ConcurrentRotatingFileHandler to address log rotation on Windows properly,
+    where a file can't be renamed if a handle to it is held by another process.
+    Concurrent Rotating file handler which properly handles exc_info on a per handler basis
+    """
+
+
 class WatchedFileHandler(
     ExcInfoOnLogLevelFormatMixin, logging.handlers.WatchedFileHandler
 ):
