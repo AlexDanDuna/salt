@@ -26,9 +26,12 @@ QUIET = logging.QUIET = 1000
 
 import salt.defaults.exitcodes  # isort:skip  pylint: disable=unused-import
 from salt._logging.handlers import DeferredStreamHandler  # isort:skip
-from salt._logging.handlers import RotatingFileHandler  # isort:skip
 if sys.platform.startswith("win"):
+    # Added by NI. Only needed on Windows where log rotation does not work
+    # properly when another process keeps a handle to the logfile open.
     from salt._logging.handlers import ConcurrentRotatingFileHandler  # isort:skip
+else:
+    from salt._logging.handlers import RotatingFileHandler  # isort:skip
 from salt._logging.handlers import StreamHandler  # isort:skip
 from salt._logging.handlers import SysLogHandler  # isort:skip
 from salt._logging.handlers import WatchedFileHandler  # isort:skip
@@ -807,6 +810,8 @@ def setup_logfile_handler(
             # handle UTF-8.
             if max_bytes > 0:
                 if sys.platform.startswith("win"):
+                    # Added by NI. Only needed on Windows where log rotation does not work
+                    # properly when another process keeps a handle to the logfile open.                    
                     handler = ConcurrentRotatingFileHandler(
                         log_path,
                         mode="a",
