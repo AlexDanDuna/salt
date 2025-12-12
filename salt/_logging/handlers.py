@@ -14,6 +14,8 @@ from salt._logging.mixins import ExcInfoOnLogLevelFormatMixin
 
 # third party libraries
 if sys.platform.startswith("win"):
+    # Added by NI. Only needed on Windows where log rotation does not work
+    # properly when another process keeps a handle to the logfile open.
     import concurrent_log_handler
 
 log = logging.getLogger(__name__)
