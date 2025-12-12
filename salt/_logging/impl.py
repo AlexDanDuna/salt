@@ -26,7 +26,7 @@ QUIET = logging.QUIET = 1000
 
 import salt.defaults.exitcodes  # isort:skip  pylint: disable=unused-import
 from salt._logging.handlers import DeferredStreamHandler  # isort:skip
-from salt._logging.handlers import RotatingFileHandler  # isort:skip
+from salt._logging.handlers import ConcurrentRotatingFileHandler  # isort:skip
 from salt._logging.handlers import StreamHandler  # isort:skip
 from salt._logging.handlers import SysLogHandler  # isort:skip
 from salt._logging.handlers import WatchedFileHandler  # isort:skip
@@ -804,7 +804,7 @@ def setup_logfile_handler(
             # user is not using plain ASCII, their system should be ready to
             # handle UTF-8.
             if max_bytes > 0:
-                handler = RotatingFileHandler(
+                handler = ConcurrentRotatingFileHandler(
                     log_path,
                     mode="a",
                     maxBytes=max_bytes,
