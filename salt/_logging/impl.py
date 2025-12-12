@@ -816,7 +816,7 @@ def setup_logfile_handler(
                         delay=0,
                     )
                 else:
-                      handler = RotatingFileHandler(
+                    handler = RotatingFileHandler(
                         log_path,
                         mode="a",
                         maxBytes=max_bytes,
