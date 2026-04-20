@@ -1548,6 +1548,115 @@ def info_installed(*names, **kwargs):
     return ret
 
 
+def _process_single_package_info_output(out, required_version, filter_attrs):
+    """
+    Helper function for single_package_info()
+
+    Processes stdout output from a single invocation of
+    'opkg info <package>', and outputs a dictionary of 
+    specified attrs, keyed by versions.
+    """
+    ret = {}
+    version = None
+    attrs = {}
+    attr = None
+
+    for line in salt.utils.itertools.split(out, "\n"):
+        if line and line[0] == " ":
+            # This is a continuation of the last attr
+            if filter_attrs is None or attr in filter_attrs:
+                line = line.strip()
+                if attrs[attr]:
+                    # If attr is empty, don't add leading newline
+                    attrs[attr] += "\n"
+                attrs[attr] += line
+            continue
+        line = line.strip()
+        if not line:
+            # Separator between different packages
+            if version:
+                if version == required_version or not required_version:
+                    ret[version] = attrs
+            version = None
+            attrs = {}
+            attr = None
+            continue
+        key, value = line.split(":", 1)
+        value = value.lstrip()
+        attr = _convert_to_standard_attr(key)
+        if attr == "version":
+            version = value
+        if filter_attrs is None or attr in filter_attrs:
+            attrs[attr] = value
+
+    if version:
+        if version == required_version or not required_version:
+            ret[version] = attrs
+    return ret
+
+
+def single_package_info(name, **kwargs):
+    """
+    Return information from feeds about the specified package.
+
+    .. versionadded:: 3006.13.0
+
+    :param name:
+        Name of the package to get information about.
+
+    :param version:
+        Specific version of the package to get information about.
+        If not specified, information about all available versions is returned.
+
+    :param attr:
+        Comma-separated package attributes. If no 'attr' is specified, all available attributes returned.
+
+        Valid attributes are:
+            arch, conffiles, conflicts, depends, description, filename, group,
+            install_date_time_t, md5sum, packager, provides, recommends,
+            replaces, size, source, suggests, url, version
+
+    :param refresh:
+        Whether to refresh the package database before querying for package info.
+        Default is True.
+
+    CLI Example:
+
+    .. code-block:: bash
+        salt '*' pkg.info package
+        salt '*' pkg.info package attr=version,packager
+    """
+    version = kwargs.pop("version", None)
+    attr = kwargs.pop("attr", None)
+    if attr is None:
+        filter_attrs = None
+    elif isinstance(attr, str):
+        filter_attrs = set(attr.split(","))
+    else:
+        filter_attrs = set(attr)
+
+    refresh = salt.utils.data.is_true(kwargs.get("refresh", True))
+    if refresh:
+        refresh_db()
+
+    ret = {}
+    if name:
+        cmd = ["opkg", "info", name]
+        call = _call_opkg(cmd)
+        if call["retcode"] != 0:
+            comment = ""
+            if call["stderr"]:
+                comment += call["stderr"]
+            else:
+                comment += call["stdout"]
+
+            raise CommandExecutionError(comment)
+
+        ret.update(_process_single_package_info_output(call["stdout"], version, filter_attrs))
+        
+    return ret
+
+
 def upgrade_available(name, **kwargs):  # pylint: disable=unused-argument
     """
     Check whether or not an upgrade is available for a given package
