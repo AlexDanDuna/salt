@@ -4334,7 +4334,9 @@ class Minion(MinionBase):
         return pillar_schedule
 
     # TODO: only allow one future in flight at a time?
-    async def pillar_refresh(self, force_refresh=False, clean_cache=False):
+    async def pillar_refresh(
+        self, force_refresh=False, clean_cache=False, refresh_id=None
+    ):
         """
         Refresh the pillar
         """
@@ -4408,6 +4410,21 @@ class Minion(MinionBase):
                 )
             except Exception as exc:  # pylint: disable=broad-except
                 log.error("Error firing pillar refresh complete event: %s", exc)
+            if refresh_id is not None:
+                try:
+                    evt.fire_event(
+                        {"complete": True, "refresh_id": refresh_id},
+                        tag=(
+                            f"{salt.defaults.events.MINION_PILLAR_REFRESH_COMPLETE}/"
+                            f"{refresh_id}"
+                        ),
+                    )
+                except Exception as exc:  # pylint: disable=broad-except
+                    log.error(
+                        "Error firing correlated pillar refresh completion event %s: %s",
+                        refresh_id,
+                        exc,
+                    )
 
     def manage_schedule(self, tag, data):
         """
@@ -4628,6 +4645,7 @@ class Minion(MinionBase):
             await _minion.pillar_refresh(
                 force_refresh=data.get("force_refresh", False),
                 clean_cache=data.get("clean_cache", False),
+                refresh_id=data.get("refresh_id"),
             )
         elif tag.startswith("beacons_refresh"):
             _minion.beacons_refresh()
