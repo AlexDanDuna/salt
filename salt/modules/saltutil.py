@@ -19,7 +19,6 @@ import sys
 import time
 import traceback
 import urllib.error
-import uuid
 
 try:
     import pwd
@@ -1375,13 +1374,6 @@ def refresh_pillar(wait=False, timeout=30, clean_cache=True, **kwargs):
         salt.utils.args.invalid_kwargs(kwargs)
 
     data = {"clean_cache": clean_cache}
-    completion_tag = None
-    if wait:
-        refresh_id = uuid.uuid4().hex
-        data["refresh_id"] = refresh_id
-        completion_tag = (
-            f"{salt.defaults.events.MINION_PILLAR_REFRESH_COMPLETE}/{refresh_id}"
-        )
     try:
         if wait:
             #  If we're going to block, first setup a listener
@@ -1393,9 +1385,8 @@ def refresh_pillar(wait=False, timeout=30, clean_cache=True, **kwargs):
                 log.trace("refresh_pillar waiting for pillar refresh to complete")
                 # Blocks until we hear this event or until the timeout expires
                 event_ret = eventer.get_event(
-                    tag=completion_tag,
+                    tag=salt.defaults.events.MINION_PILLAR_REFRESH_COMPLETE,
                     wait=timeout,
-                    match_type="fnmatch",
                 )
                 if not event_ret or event_ret["complete"] is False:
                     log.warning(
