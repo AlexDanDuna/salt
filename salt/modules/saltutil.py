@@ -1345,12 +1345,11 @@ def refresh_matchers():
     return ret
 
 
-def refresh_pillar(wait=False, timeout=30, clean_cache=True, **kwargs):
+def refresh_pillar(wait=False, timeout=30, clean_cache=True):
     """
     Signal the minion to refresh the in-memory pillar data. See :ref:`pillar-in-memory`.
 
     :param wait:            Wait for pillar refresh to complete, defaults to False.
-                            Calls with a published job ID always wait, even when wait is False.
     :type wait:             bool, optional
     :param timeout:         How long to wait in seconds, only used when wait is True, defaults to 30.
     :type timeout:          int, optional
@@ -1366,13 +1365,6 @@ def refresh_pillar(wait=False, timeout=30, clean_cache=True, **kwargs):
         salt '*' saltutil.refresh_pillar
         salt '*' saltutil.refresh_pillar wait=True timeout=60
     """
-    if kwargs.get("__pub_jid") is not None:
-        wait = True
-
-    kwargs = salt.utils.args.clean_kwargs(**kwargs)
-    if kwargs:
-        salt.utils.args.invalid_kwargs(kwargs)
-
     data = {"clean_cache": clean_cache}
     try:
         if wait:
